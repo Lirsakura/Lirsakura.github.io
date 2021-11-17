@@ -41,4 +41,31 @@
     
   </entry>
   
+  <entry>
+    <title>旅游计划</title>
+    <link href="http://example.com/2021/11/16/%E8%BF%AA%E5%A3%AB%E5%B0%BC/"/>
+    <id>http://example.com/2021/11/16/%E8%BF%AA%E5%A3%AB%E5%B0%BC/</id>
+    <published>2021-11-16T08:41:06.000Z</published>
+    <updated>2021-11-17T07:38:36.064Z</updated>
+    
+    <content type="html"><![CDATA[<p>期待迪士尼之行</p>]]></content>
+    
+    
+      
+      
+    <summary type="html">&lt;p&gt;期待迪士尼之行&lt;/p&gt;
+</summary>
+      
+    
+    
+    
+    <category term="travel" scheme="http://example.com/categories/travel/"/>
+    
+    <category term="shanghai" scheme="http://example.com/categories/travel/shanghai/"/>
+    
+    
+    <category term="travel" scheme="http://example.com/tags/travel/"/>
+    
+  </entry>
+  
 </feed>

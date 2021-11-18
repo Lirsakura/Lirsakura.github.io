@@ -112,68 +112,36 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="安装方式"><a href="#安装方式" class="headerlink" title="安装方式"></a>安装方式</h2><p>先使用pip安装<code>pip install nltk</code>，接着在命令行中输入如下句子，即可下载。</p>
+  <h2 id="安装方式">安装方式</h2>
+<p>先使用pip安装<code>pip install nltk</code>，接着在命令行中输入如下句子，即可下载。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import nltk</span><br><span class="line">nltk.download()</span><br></pre></td></tr></table></figure>
-
 <p>如果报错，则修改Sever Index为<code>http://www.nltk.org/nltk_data/</code>即可下载任意数据。但也可能存在即使改了也不生效的情况，可以上网查找一波前辈们已经整理好的文件夹，按照他们的博文里面的方式解压存放。</p>
 <p>这里注意解压之后把<code>package</code>改名为<code>nltk_data</code>后移动到相应的位置即可。</p>
-<h2 id="使用方法"><a href="#使用方法" class="headerlink" title="使用方法"></a>使用方法</h2><p>查找指定单词上下文，使用函数<code>concorance    </code></p>
+<h2 id="使用方法">使用方法</h2>
+<p>查找指定单词上下文，使用函数<code>concorance	</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text1.concordance(&#x27;monstrous&#x27;)</span><br></pre></td></tr></table></figure>
-
 <p>查找文本中意思相近的词语，使用函数<code>similar</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text1.similar(&#x27;monstrous&#x27;)</span><br></pre></td></tr></table></figure>
-
 <p>查找两个及以上词汇共用的上下文，使用函数<code>common_context</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text2.common_contexts([&#x27;monstrous&#x27;,&#x27;very&#x27;])</span><br></pre></td></tr></table></figure>
-
 <p>根据某一风格生成随机文本，使用函数<code>generate</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text2.generate()</span><br></pre></td></tr></table></figure>
-
 <p>查看文本中某一词汇出现的次数</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text3.count(&#x27;smote&#x27;)</span><br></pre></td></tr></table></figure>
-
 <p>可以通过如下函数实现文本词汇丰富度测量</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def lexical_diversity(text):</span><br><span class="line">    return len(text)/len(set(text))</span><br></pre></td></tr></table></figure>
-
 <p>查看单个词汇在全文中占比</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def percentage(count,total):</span><br><span class="line">    return 100*count/total</span><br><span class="line">percentage(text4.count(&#x27;a&#x27;),len(text4))</span><br></pre></td></tr></table></figure>
-
 <p>查找给定单词在文本中的频率分布，使用<code>FreqDist</code>，该函数的返回值为一个字典。</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fdist1=FreqDist(text1)</span><br><span class="line">fdist1</span><br><span class="line"></span><br><span class="line">#output</span><br><span class="line">FreqDist(&#123;&#x27;,&#x27;: 18713, &#x27;the&#x27;: 13721, &#x27;.&#x27;: 6862, &#x27;of&#x27;: 6536, &#x27;and&#x27;: 6024, &#x27;a&#x27;: 4569, &#x27;to&#x27;: 4542, &#x27;;&#x27;: 4072, &#x27;in&#x27;: 3916, &#x27;that&#x27;: 2982, ...&#125;)</span><br></pre></td></tr></table></figure>
-
 <p>也可以绘制图text1文本最常见的50个词</p>
 <p><img src="/2021/11/16/nltk%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/freq-50.png" alt="freq-50"></p>
 <p>接着可以查看文本中任意词汇出现的频率</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdist1.freq(&#x27;very&#x27;)</span><br></pre></td></tr></table></figure>
-
 <p>通过<code>bigrams</code>可以实现词语两两搭配</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[i for i in bigrams([&#x27;I&#x27;,&#x27;love&#x27;,&#x27;nlp&#x27;])]</span><br><span class="line"></span><br><span class="line">#output</span><br><span class="line">[(&#x27;I&#x27;, &#x27;love&#x27;), (&#x27;love&#x27;, &#x27;nlp&#x27;)]</span><br></pre></td></tr></table></figure>
-
 <p>查找词汇搭配使用<code>collocations()</code></p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text4.collocations()</span><br></pre></td></tr></table></figure>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  
       <!-- reward -->
       
@@ -243,7 +211,7 @@
 </div>
 
 <div id="share-mask"></div>  
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nlp%E2%80%94nltk/" rel="tag">nlp—nltk</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nlp/" rel="tag">nlp</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/nltk/" rel="tag">nltk</a></li></ul>
 
     </footer>
   </div>

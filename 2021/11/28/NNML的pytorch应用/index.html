@@ -13,7 +13,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1, maximum-scale=1"
       />
-      <title>nltk使用指南 |  evitcet&#39;s blog</title>
+      <title>NNML的pytorch应用 |  evitcet&#39;s blog</title>
   <meta name="generator" content="hexo-theme-ayer">
       
       <link rel="shortcut icon" href="/images/ico.jpg" />
@@ -57,7 +57,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-nltk使用指南"
+  id="post-NNML的pytorch应用"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -68,7 +68,7 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  nltk使用指南
+  NNML的pytorch应用
 </h1>
  
 
@@ -76,8 +76,8 @@
     </header>
      
     <div class="article-meta">
-      <a href="/2021/11/16/nltk%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" class="article-date">
-  <time datetime="2021-11-16T12:28:53.000Z" itemprop="datePublished">2021-11-16</time>
+      <a href="/2021/11/28/NNML%E7%9A%84pytorch%E5%BA%94%E7%94%A8/" class="article-date">
+  <time datetime="2021-11-28T09:38:36.000Z" itemprop="datePublished">2021-11-28</time>
 </a> 
   <div class="article-category">
     <a class="article-category-link" href="/categories/Learn/">Learn</a>
@@ -88,7 +88,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
             <span class="post-meta-item-text"> 字数统计:</span>
-            <span class="post-count">461</span>
+            <span class="post-count">824</span>
         </span>
     </span>
 
@@ -97,7 +97,7 @@
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
             <span class="post-meta-item-text"> 阅读时长≈</span>
-            <span class="post-count">1 分钟</span>
+            <span class="post-count">4 分钟</span>
         </span>
     </span>
 </div>
@@ -112,36 +112,32 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <h2 id="安装方式">安装方式</h2>
-<p>先使用pip安装<code>pip install nltk</code>，接着在命令行中输入如下句子，即可下载。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">import nltk</span><br><span class="line">nltk.download()</span><br></pre></td></tr></table></figure>
-<p>如果报错，则修改Sever Index为<code>http://www.nltk.org/nltk_data/</code>即可下载任意数据。但也可能存在即使改了也不生效的情况，可以上网查找一波前辈们已经整理好的文件夹，按照他们的博文里面的方式解压存放。</p>
-<p>这里注意解压之后把<code>package</code>改名为<code>nltk_data</code>后移动到相应的位置即可。</p>
-<h2 id="使用方法">使用方法</h2>
-<p>查找指定单词上下文，使用函数<code>concorance	</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text1.concordance(&#x27;monstrous&#x27;)</span><br></pre></td></tr></table></figure>
-<p>查找文本中意思相近的词语，使用函数<code>similar</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text1.similar(&#x27;monstrous&#x27;)</span><br></pre></td></tr></table></figure>
-<p>查找两个及以上词汇共用的上下文，使用函数<code>common_context</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text2.common_contexts([&#x27;monstrous&#x27;,&#x27;very&#x27;])</span><br></pre></td></tr></table></figure>
-<p>根据某一风格生成随机文本，使用函数<code>generate</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text2.generate()</span><br></pre></td></tr></table></figure>
-<p>查看文本中某一词汇出现的次数</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text3.count(&#x27;smote&#x27;)</span><br></pre></td></tr></table></figure>
-<p>可以通过如下函数实现文本词汇丰富度测量</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">def lexical_diversity(text):</span><br><span class="line">    return len(text)/len(set(text))</span><br></pre></td></tr></table></figure>
-<p>查看单个词汇在全文中占比</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">def percentage(count,total):</span><br><span class="line">    return 100*count/total</span><br><span class="line">percentage(text4.count(&#x27;a&#x27;),len(text4))</span><br></pre></td></tr></table></figure>
-<p>查找给定单词在文本中的频率分布，使用<code>FreqDist</code>，该函数的返回值为一个字典。</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">fdist1=FreqDist(text1)</span><br><span class="line">fdist1</span><br><span class="line"></span><br><span class="line">#output</span><br><span class="line">FreqDist(&#123;&#x27;,&#x27;: 18713, &#x27;the&#x27;: 13721, &#x27;.&#x27;: 6862, &#x27;of&#x27;: 6536, &#x27;and&#x27;: 6024, &#x27;a&#x27;: 4569, &#x27;to&#x27;: 4542, &#x27;;&#x27;: 4072, &#x27;in&#x27;: 3916, &#x27;that&#x27;: 2982, ...&#125;)</span><br></pre></td></tr></table></figure>
-<p>也可以绘制图text1文本最常见的50个词</p>
-<p><img src="/2021/11/16/nltk%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/freq-50.png" alt="freq-50"></p>
-<p>接着可以查看文本中任意词汇出现的频率</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">fdist1.freq(&#x27;very&#x27;)</span><br></pre></td></tr></table></figure>
-<p>通过<code>bigrams</code>可以实现词语两两搭配</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[i for i in bigrams([&#x27;I&#x27;,&#x27;love&#x27;,&#x27;nlp&#x27;])]</span><br><span class="line"></span><br><span class="line">#output</span><br><span class="line">[(&#x27;I&#x27;, &#x27;love&#x27;), (&#x27;love&#x27;, &#x27;nlp&#x27;)]</span><br></pre></td></tr></table></figure>
-<p>查找词汇搭配使用<code>collocations()</code></p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">text4.collocations()</span><br></pre></td></tr></table></figure>
+  <h1>NNML的pytorch应用</h1>
+<p>本文主要介绍基于pytorch框架下的NNML解决的一个问题：预测给定序列的下一个单词。</p>
+<p><strong>导入需要用到的库</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> torch</span><br><span class="line"><span class="keyword">import</span> torch.nn <span class="keyword">as</span> nn</span><br><span class="line"><span class="keyword">import</span> torch.optim <span class="keyword">as</span> optim</span><br><span class="line"><span class="keyword">import</span> torch.utils.data <span class="keyword">as</span> Data</span><br><span class="line"></span><br><span class="line">device = torch.device(<span class="string">&quot;cuda&quot;</span> <span class="keyword">if</span> torch.cuda.is_available() <span class="keyword">else</span> <span class="string">&quot;cpu&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>处理数据</strong></p>
+<p>简单起见，本文提供4个长度一致的短句，如果长度不一致需要对句子进行填充或者是截断。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">sentences = [<span class="string">&quot;i like dog&quot;</span>, <span class="string">&quot;i love coffee&quot;</span>, <span class="string">&quot;i hate milk&quot;</span>,<span class="string">&quot;he like cat&quot;</span>]</span><br><span class="line">word_list = <span class="string">&quot; &quot;</span>.join(sentences).split()</span><br><span class="line">word_list = <span class="built_in">list</span>(<span class="built_in">set</span>(word_list))<span class="comment">#将句子整理成无重复单词的词表</span></span><br><span class="line"><span class="comment">#[&#x27;cat&#x27;, &#x27;love&#x27;, &#x27;milk&#x27;, &#x27;coffee&#x27;, &#x27;hate&#x27;, &#x27;he&#x27;, &#x27;i&#x27;, &#x27;dog&#x27;, &#x27;like&#x27;]</span></span><br></pre></td></tr></table></figure>
+<p>首先构建字典，<code>word2id</code>是每个单词对应的索引，<code>id2word</code>是每个索引对应的单词，<code>n_class</code>是词表的总个数，也即论文里的<code>|V|</code>。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">word2id = &#123;w: i <span class="keyword">for</span> i, w <span class="keyword">in</span> <span class="built_in">enumerate</span>(word_list)&#125;</span><br><span class="line"><span class="comment"># &#123;&#x27;cat&#x27;: 0,&#x27;love&#x27;: 1,&#x27;milk&#x27;: 2,&#x27;coffee&#x27;: 3,&#x27;hate&#x27;: 4,&#x27;he&#x27;: 5,&#x27;i&#x27;: 6,&#x27;dog&#x27;: 7,&#x27;like&#x27;: 8&#125;</span></span><br><span class="line"></span><br><span class="line">id2word = &#123;i: w <span class="keyword">for</span> i, w <span class="keyword">in</span> <span class="built_in">enumerate</span>(word_list)&#125;</span><br><span class="line"><span class="comment"># &#123;0: &#x27;cat&#x27;,1: &#x27;love&#x27;,2: &#x27;milk&#x27;,3: &#x27;coffee&#x27;,4: &#x27;hate&#x27;,5: &#x27;he&#x27;,6: &#x27;i&#x27;,7: &#x27;dog&#x27;,8: &#x27;like&#x27;&#125;</span></span><br><span class="line"></span><br><span class="line">n_class = <span class="built_in">len</span>(word2id)  <span class="comment"># number of Vocabulary</span></span><br><span class="line"><span class="comment"># 9</span></span><br></pre></td></tr></table></figure>
+<p>其次设置模型所需的基本参数。</p>
+<ul>
+<li><code>n_step</code>：已知长序列的单词个数</li>
+<li><code>m</code>：embedding size，即每个单词对应的特征向量维度</li>
+<li><code>n_hidden</code>：模型中隐藏层的个数</li>
+<li><code>batch_size</code>：每组数据的个数</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">n_step = <span class="number">2</span> <span class="comment"># number of steps, n-1 in paper</span></span><br><span class="line">n_hidden = <span class="number">2</span> <span class="comment"># number of hidden size, h in paper</span></span><br><span class="line">m = <span class="number">2</span> <span class="comment"># embedding size, m in paper</span></span><br><span class="line">batch_size = <span class="number">1</span></span><br></pre></td></tr></table></figure>
+<p>最后根据上述参数构建Dataset和DataLoader。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">make_data</span>():</span></span><br><span class="line">    input_batch = []</span><br><span class="line">    target_batch = []</span><br><span class="line"></span><br><span class="line">    <span class="keyword">for</span> sen <span class="keyword">in</span> sentences:</span><br><span class="line">        word = sen.split() <span class="comment"># space tokenizer 对每个句子单独处理</span></span><br><span class="line">        <span class="built_in">input</span> = [word_dict[n] <span class="keyword">for</span> n <span class="keyword">in</span> word[:-<span class="number">1</span>]] <span class="comment"># create (1~n-1) as input 获取前n_step个单词对应的索引</span></span><br><span class="line">        target = word_dict[word[-<span class="number">1</span>]] <span class="comment"># create (n) as target, We usually call this &#x27;casual language model&#x27; 获得需要预测的第n个单词的索引</span></span><br><span class="line"></span><br><span class="line">        input_batch.append(<span class="built_in">input</span>)</span><br><span class="line">        target_batch.append(target)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> input_batch, target_batch</span><br><span class="line"></span><br><span class="line"><span class="comment">#input_batch: [[6,8],[6,1],[6,4],[5,8]]</span></span><br><span class="line"><span class="comment">#output_batch: [7,3,2,0]</span></span><br><span class="line"></span><br><span class="line">dataset = Data.TensorDataset(input_batch, target_batch)</span><br><span class="line">loader = Data.DataLoader(dataset, batch_size, <span class="literal">False</span>)</span><br></pre></td></tr></table></figure>
+<p><strong>构建模型</strong></p>
+<p>NNML中一共有6个参数，表达式为<code>y=b+Wx+Utanh(d+Hx)</code></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">NNML</span>(<span class="params">nn.Module</span>):</span></span><br><span class="line">	<span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self</span>):</span></span><br><span class="line">		<span class="built_in">super</span>(NNLM, self).__init__()</span><br><span class="line">        self.C = nn.Embedding(n_class, m)</span><br><span class="line">        self.H = nn.Linear(n_step * m, n_hidden, bias=<span class="literal">False</span>)</span><br><span class="line">        self.d = nn.Parameter(torch.ones(n_hidden))</span><br><span class="line">        self.U = nn.Linear(n_hidden, n_class, bias=<span class="literal">False</span>)</span><br><span class="line">        self.W = nn.Linear(n_step * m, n_class, bias=<span class="literal">False</span>)</span><br><span class="line">        self.b = nn.Parameter(torch.ones(n_class))</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">forward</span>(<span class="params">self, X</span>):</span></span><br><span class="line">        <span class="comment"># X : [batch_size,n_step]</span></span><br><span class="line">        X = self.C(X) <span class="comment"># X : [batch_size, n_step, m] 将前n-1个单词映射成维度为m的特征向量</span></span><br><span class="line">        X = X.view(-<span class="number">1</span>, n_step * m) <span class="comment"># [batch_size, n_step * m]</span></span><br><span class="line">        tanh = torch.tanh(self.d + self.H(X)) <span class="comment"># [batch_size, n_hidden]</span></span><br><span class="line">        output = self.b + self.W(X) + self.U(tanh) <span class="comment"># [batch_size, n_class]</span></span><br><span class="line">        <span class="keyword">return</span> output</span><br></pre></td></tr></table></figure>
+<p><strong>训练数据</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">model = NNLM().to(device) <span class="comment">#定义模型</span></span><br><span class="line"></span><br><span class="line">criterion = nn.CrossEntropyLoss().to(device) <span class="comment">#定义损失函数</span></span><br><span class="line">optimizer = optim.Adam(model.parameters(), lr=<span class="number">0.001</span>) <span class="comment">#定义优化器</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> epoch <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">5000</span>):</span><br><span class="line">    <span class="keyword">for</span> x,y <span class="keyword">in</span> loader:</span><br><span class="line">        x,y =x.to(device),y.to(device)</span><br><span class="line">        optimizer.zero_grad()</span><br><span class="line">        output = model(x)</span><br><span class="line">        <span class="comment"># output : [batch_size, n_class], target_batch : [batch_size]</span></span><br><span class="line">        </span><br><span class="line">        loss = criterion(output, y)</span><br><span class="line">        loss.backward()</span><br><span class="line">        optimizer.step()</span><br><span class="line">    <span class="keyword">if</span> (epoch + <span class="number">1</span>) % <span class="number">1000</span> == <span class="number">0</span>:</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">&#x27;Epoch:&#x27;</span>, <span class="string">&#x27;%04d&#x27;</span> % (epoch + <span class="number">1</span>), <span class="string">&#x27;cost =&#x27;</span>, <span class="string">&#x27;&#123;:.6f&#125;&#x27;</span>.<span class="built_in">format</span>(loss))</span><br></pre></td></tr></table></figure>
+<p><strong>测试数据</strong></p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">ctxid=<span class="number">0</span></span><br><span class="line"><span class="keyword">for</span> x,y <span class="keyword">in</span> loader:</span><br><span class="line">    x,y =x.to(device),y.to(device)</span><br><span class="line">    predict = model(x).data.<span class="built_in">max</span>(<span class="number">1</span>, keepdim=<span class="literal">True</span>)[<span class="number">1</span>]</span><br><span class="line">    <span class="built_in">print</span>(sentences[ctxid].split()[:<span class="number">2</span>], <span class="string">&#x27;-&gt;&#x27;</span>, id2word[predict.squeeze().item()]) </span><br><span class="line">    ctxid+=<span class="number">1</span></span><br></pre></td></tr></table></figure>
  
       <!-- reward -->
       
@@ -206,12 +202,12 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2021/11/16/nltk%E4%BD%BF%E7%94%A8%E6%8C%87%E5%8D%97/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2021/11/28/NNML%E7%9A%84pytorch%E5%BA%94%E7%94%A8/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>  
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLP/" rel="tag">NLP</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLTK/" rel="tag">NLTK</a></li></ul>
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code/" rel="tag">Code</a></li><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/NLP/" rel="tag">NLP</a></li></ul>
 
     </footer>
   </div>
@@ -219,19 +215,19 @@
    
   <nav class="article-nav">
     
-      <a href="/2021/11/17/NNML%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" class="article-nav-link">
+      <a href="/2021/11/29/CBOW%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" class="article-nav-link">
         <strong class="article-nav-caption">上一篇</strong>
         <div class="article-nav-title">
           
-            NNML论文阅读
+            CBOW论文阅读
           
         </div>
       </a>
     
     
-      <a href="/2021/11/16/%E8%BF%AA%E5%A3%AB%E5%B0%BC/" class="article-nav-link">
+      <a href="/2021/11/18/HHM/" class="article-nav-link">
         <strong class="article-nav-caption">下一篇</strong>
-        <div class="article-nav-title">旅游计划</div>
+        <div class="article-nav-title">隐马尔可夫模型</div>
       </a>
     
   </nav>

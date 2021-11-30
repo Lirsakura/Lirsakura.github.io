@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+  
+
+    <head>
+      <meta charset="utf-8" />
+        
+      <meta name="description" content="just a bad code" />
+      
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1, maximum-scale=1"
+      />
+      <title>Huffman tree的python实现 |  evitcet&#39;s blog</title>
+  <meta name="generator" content="hexo-theme-ayer">
+      
+      <link rel="shortcut icon" href="/images/ico.jpg" />
+       
+<link rel="stylesheet" href="/dist/main.css">
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css"
+      />
+      
+<link rel="stylesheet" href="/css/custom.css">
+ 
+      <script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+       
+ 
+
+      <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bulma@5.0.1/bulma.min.css"
+      />
+      <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.19/dist/sweetalert2.min.js"></script>
+
+      <!-- mermaid -->
+      
+      <style>
+        .swal2-styled.swal2-confirm {
+          font-size: 1.6rem;
+        }
+      </style>
+    <link rel="alternate" href="/atom.xml" title="evitcet's blog" type="application/atom+xml">
+<link href="https://cdn.bootcss.com/KaTeX/0.11.1/katex.min.css" rel="stylesheet" /></head>
+  </html>
+</html>
+
+
+<body>
+  <div id="app">
+    
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-Huffman-tree的python实现"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Huffman tree的python实现
+</h1>
+ 
+
+      
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2021/11/30/Huffman-tree%E7%9A%84python%E5%AE%9E%E7%8E%B0/" class="article-date">
+  <time datetime="2021-11-30T13:08:31.000Z" itemprop="datePublished">2021-11-30</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/Learn/">Learn</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">2k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">8 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <p>因为层次softmax用到了哈夫曼树，因此这里给出对应的代码实现，原理大家可以上网找一下，不过我相信应该都会的(≧▽≦)</p>
+<p>首先构建一个哈夫曼树的结点，结点中需要存储的信息有：</p>
+<ol>
+<li><code>word_id</code> : 结点编号</li>
+<li><code>frequency </code>: 节点权值（如果把结点当作单词，可以理解为文本里该单词出现的频率）</li>
+<li><code>left child</code> : 左子树</li>
+<li><code>right child</code> : 右子树</li>
+<li><code> father</code> : 父结点</li>
+<li><code>Huffman code</code> : 哈夫曼码</li>
+<li><code>path</code> : 根到叶子结点的中间结点id（记录走到该结点经过的路径）</li>
+</ol>
+<p>现在就可以搭建一棵哈夫曼树的雏形：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HuffmanTree</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, wordid_frequency_dict</span>):</span> <span class="comment"># 获取所有的结点id以及对应权值组成的字典</span></span><br><span class="line">        self.word_count = <span class="built_in">len</span>(wordid_frequency_dict)  <span class="comment"># 结点个数，也即单词数量</span></span><br><span class="line">        self.wordid_code = <span class="built_in">dict</span>() <span class="comment"># 找到该结点的哈夫曼码</span></span><br><span class="line">        self.wordid_path = <span class="built_in">dict</span>() <span class="comment"># 找到该结点经过的中间结点编号</span></span><br><span class="line">        self.root = <span class="literal">None</span> <span class="comment"># 根节点</span></span><br><span class="line">        unmerge_node_list = [HuffmanNode(wordid, frequency) <span class="keyword">for</span> wordid, frequency <span class="keyword">in</span></span><br><span class="line">                             wordid_frequency_dict.items()]  <span class="comment"># 未合并节点list</span></span><br><span class="line">        self.huffman = [HuffmanNode(wordid, frequency) <span class="keyword">for</span> wordid, frequency <span class="keyword">in</span></span><br><span class="line">                        wordid_frequency_dict.items()]  <span class="comment"># 存储所有的叶子节点和中间节点</span></span><br><span class="line">        <span class="comment"># 构建huffman tree</span></span><br><span class="line">        self.build_tree(unmerge_node_list) </span><br><span class="line">        <span class="comment"># 生成huffman code</span></span><br><span class="line">        self.generate_huffman_code_and_path()</span><br></pre></td></tr></table></figure>
+<p>这里给出哈夫曼编码结点的代码：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HuffmanNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, word_id, frequency</span>):</span></span><br><span class="line">        self.word_id = word_id  <span class="comment"># 叶子结点存词对应的id, 父（中间）结点存父结点对应的id</span></span><br><span class="line">        self.frequency = frequency  <span class="comment"># 存权值，也即单词频次</span></span><br><span class="line">        self.left_child = <span class="literal">None</span></span><br><span class="line">        self.right_child = <span class="literal">None</span></span><br><span class="line">        self.father = <span class="literal">None</span></span><br><span class="line">        self.Huffman_code = []  <span class="comment"># 哈夫曼码（左1右0）</span></span><br><span class="line">        self.path = []  <span class="comment"># 根到叶子结点点的中间节点id</span></span><br></pre></td></tr></table></figure>
+<p>构建一棵哈夫曼树的最重要步骤是合并当前权值最小的两个结点，这两个结点可以合并成为一个新的父结点，也可以称为中间结点，最后合并成的中间结点是根结点。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">merge_node</span>(<span class="params">self, node1, node2</span>):</span></span><br><span class="line">    sum_frequency = node1.frequency + node2.frequency <span class="comment"># 求两个结点的权值之和，将其作为这两个结点的父结点权值</span></span><br><span class="line">    mid_node_id = <span class="built_in">len</span>(self.huffman)  <span class="comment"># 将现有的哈夫曼结点数作为父结点的id</span></span><br><span class="line">    father_node = HuffmanNode(mid_node_id, sum_frequency) <span class="comment">#生成一个新的结点，即父结点。</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 左子树存放权值大的结点，右边存放权值小的结点</span></span><br><span class="line">    <span class="keyword">if</span> node1.frequency &gt;= node2.frequency:</span><br><span class="line">        father_node.left_child = node1</span><br><span class="line">        father_node.right_child = node2</span><br><span class="line">    <span class="keyword">else</span>:</span><br><span class="line">        father_node.left_child = node2</span><br><span class="line">        father_node.right_child = node1      </span><br><span class="line">    self.huffman.append(father_node) <span class="comment"># 将新生成的哈夫曼结点添加到已有结点中</span></span><br><span class="line">    <span class="keyword">return</span> father_node <span class="comment"># 返回生成的父结点</span></span><br></pre></td></tr></table></figure>
+<p>接着我们要把树给搭起来，哈夫曼建树的原则一直是不断合并最小结点，直到合并结束。每次参与合并的两个最小结点不会再参与之后的合并。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_tree</span>(<span class="params">self, node_list</span>):</span></span><br><span class="line">    <span class="keyword">while</span> <span class="built_in">len</span>(node_list) &gt; <span class="number">1</span>:</span><br><span class="line">        <span class="comment"># 这里i1和i2的初值其实可以随便选取，每轮结束之后，两个值代表的一定都是现有的仍未合并的结点中概率最小的两个结点</span></span><br><span class="line">        i1 = <span class="number">0</span>  <span class="comment"># 当前概率最小的结点（也可以随意赋初值，代码方便一般都为0）</span></span><br><span class="line">        i2 = <span class="number">1</span>  <span class="comment"># 当前概率第二小的结点（也可以随意赋初值，代码方便一般都为1）</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 如果i2代表的结点权值大于i1代表的结点权值，则交换两个结点</span></span><br><span class="line">        <span class="keyword">if</span> node_list[i2].frequency &lt; node_list[i1].frequency:</span><br><span class="line">            [i1, i2] = [i2, i1]</span><br><span class="line">            </span><br><span class="line">        <span class="comment"># 依次遍历余下结点，如果存在其他结点的权值小于i2结点，则将i2结点的id更改成该结点，更改后还要将新的i2结点权值与原有的i1结点权值做比较，如果该结点的权值也小于i1结点的权值，则将i1结点的id更新为该结点（也是更新后的i2结点）</span></span><br><span class="line">        <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>, <span class="built_in">len</span>(node_list)):</span><br><span class="line">            <span class="keyword">if</span> node_list[i].frequency &lt; node_list[i2].frequency:</span><br><span class="line">                i2 = i</span><br><span class="line">                <span class="keyword">if</span> node_list[i2].frequency &lt; node_list[i1].frequency:</span><br><span class="line">                    [i1, i2] = [i2, i1]</span><br><span class="line">                    </span><br><span class="line">        father_node = self.merge_node(node_list[i1], node_list[i2])  <span class="comment"># 合并最小的两个结点，生成父结点</span></span><br><span class="line">        </span><br><span class="line">        <span class="comment"># 如果i1结点的编号小于i2结点，则先弹出i2结点，再弹出i1结点，反之亦然，但两个结点不可能是同一个编号，左右子树结点的编号一定不同。</span></span><br><span class="line">        <span class="keyword">if</span> i1 &lt; i2:</span><br><span class="line">            node_list.pop(i2)</span><br><span class="line">            node_list.pop(i1)</span><br><span class="line">        <span class="keyword">elif</span> i1 &gt; i2:</span><br><span class="line">            node_list.pop(i1)</span><br><span class="line">            node_list.pop(i2)</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            <span class="keyword">raise</span> RuntimeError(<span class="string">&#x27;i1 should not be equal to i2&#x27;</span>)            </span><br><span class="line">        node_list.insert(<span class="number">0</span>, father_node)  <span class="comment"># 在第一位插入新节点</span></span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 最后还留在结点列表中的结点的新的父结点就是根节点</span></span><br><span class="line">    self.root = node_list[<span class="number">0</span>]</span><br></pre></td></tr></table></figure>
+<p>最后构建哈夫曼编码和路径</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_huffman_code_and_path</span>(<span class="params">self</span>):</span></span><br><span class="line">    <span class="comment"># 用栈来存放各个结点，先存储根节点</span></span><br><span class="line">    stack = [self.root]</span><br><span class="line">    </span><br><span class="line">    <span class="comment"># 判断栈中是否还有结点存在</span></span><br><span class="line">    <span class="keyword">while</span> <span class="built_in">len</span>(stack) &gt; <span class="number">0</span>:</span><br><span class="line">        node = stack.pop() <span class="comment"># 最先弹出根节点，其次弹出父结点，最后叶子结点</span></span><br><span class="line">        <span class="comment"># 先顺着左子树走</span></span><br><span class="line">        <span class="keyword">while</span> node.left_child <span class="keyword">or</span> node.right_child: <span class="comment"># 判断是否存在左子树或者右子树</span></span><br><span class="line">            code = node.Huffman_code</span><br><span class="line">            path = node.path</span><br><span class="line">            node.left_child.Huffman_code = code + [<span class="number">1</span>] <span class="comment"># 在其左子树结点的哈夫曼编码中添加对应的编码1</span></span><br><span class="line">            node.right_child.Huffman_code = code + [<span class="number">0</span>] <span class="comment"># 在其右子树结点的哈夫曼编码中添加对应的编码0</span></span><br><span class="line">            node.left_child.path = path + [node.word_id] <span class="comment"># 在其左子树结点的哈夫曼编码中添加其对应的id</span></span><br><span class="line">            node.right_child.path = path + [node.word_id] <span class="comment"># 在其右子树结点的哈夫曼编码中添加其对应的id</span></span><br><span class="line">            <span class="comment"># 把没走过的右子树加入栈</span></span><br><span class="line">            stack.append(node.right_child)            </span><br><span class="line">            <span class="comment"># 令当前结点为其左子树的结点</span></span><br><span class="line">            node = node.left_child</span><br><span class="line">		</span><br><span class="line">        <span class="comment"># 当确定该节点的左子树全部走完之后，进入下述步骤。       </span></span><br><span class="line">        word_id = node.word_id  </span><br><span class="line">        word_code = node.Huffman_code</span><br><span class="line">        word_path = node.path</span><br><span class="line">        self.huffman[word_id].Huffman_code = word_code</span><br><span class="line">        self.huffman[word_id].path = word_path</span><br><span class="line">        <span class="comment"># 把节点计算得到的霍夫曼码、路径  写入词典的数值中</span></span><br><span class="line">        self.wordid_code[word_id] = word_code</span><br><span class="line">        self.wordid_path[word_id] = word_path</span><br></pre></td></tr></table></figure>
+<p>这里也可以获取所有结点的正向和负向路径，即哈夫曼编码中1和0代表的结点</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># 获取所有词的正向节点id和负向节点id数组</span></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">get_all_pos_and_neg_path</span>(<span class="params">self</span>):</span></span><br><span class="line">    positive = []  <span class="comment"># 所有词的正向路径数组</span></span><br><span class="line">    negative = []  <span class="comment"># 所有词的负向路径数组</span></span><br><span class="line">    <span class="keyword">for</span> word_id <span class="keyword">in</span> <span class="built_in">range</span>(self.word_count):</span><br><span class="line">        pos_id = []  <span class="comment"># 存放一个词 路径中的正向节点id</span></span><br><span class="line">        neg_id = []  <span class="comment"># 存放一个词 路径中的负向节点id</span></span><br><span class="line">        <span class="keyword">for</span> i, code <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.huffman[word_id].Huffman_code):</span><br><span class="line">            <span class="keyword">if</span> code == <span class="number">1</span>:</span><br><span class="line">                pos_id.append(self.huffman[word_id].path[i])</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                neg_id.append(self.huffman[word_id].path[i])</span><br><span class="line">        positive.append(pos_id)</span><br><span class="line">        negative.append(neg_id)</span><br><span class="line">    <span class="keyword">return</span> positive, negative</span><br></pre></td></tr></table></figure>
+<p>最后完整代码如下：</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"><span class="string">    构建霍夫曼树</span></span><br><span class="line"><span class="string">&quot;&quot;&quot;</span></span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HuffmanNode</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, word_id, frequency</span>):</span></span><br><span class="line">        self.word_id = word_id </span><br><span class="line">        self.frequency = frequency  </span><br><span class="line">        self.left_child = <span class="literal">None</span></span><br><span class="line">        self.right_child = <span class="literal">None</span></span><br><span class="line">        self.father = <span class="literal">None</span></span><br><span class="line">        self.Huffman_code = []  </span><br><span class="line">        self.path = []  </span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">HuffmanTree</span>:</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span>(<span class="params">self, wordid_frequency_dict</span>):</span></span><br><span class="line">        self.word_count = <span class="built_in">len</span>(wordid_frequency_dict)  </span><br><span class="line">        self.wordid_code = <span class="built_in">dict</span>()</span><br><span class="line">        self.wordid_path = <span class="built_in">dict</span>()</span><br><span class="line">        self.root = <span class="literal">None</span></span><br><span class="line">        unmerge_node_list = [HuffmanNode(wordid, frequency) <span class="keyword">for</span> wordid, frequency <span class="keyword">in</span></span><br><span class="line">                             wordid_frequency_dict.items()]  </span><br><span class="line">        self.huffman = [HuffmanNode(wordid, frequency) <span class="keyword">for</span> wordid, frequency <span class="keyword">in</span></span><br><span class="line">                        wordid_frequency_dict.items()]  </span><br><span class="line">        </span><br><span class="line">        self.build_tree(unmerge_node_list)</span><br><span class="line">        self.generate_huffman_code_and_path()</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">merge_node</span>(<span class="params">self, node1, node2</span>):</span></span><br><span class="line">        sum_frequency = node1.frequency + node2.frequency</span><br><span class="line">        mid_node_id = <span class="built_in">len</span>(self.huffman) </span><br><span class="line">        father_node = HuffmanNode(mid_node_id, sum_frequency)</span><br><span class="line">        <span class="keyword">if</span> node1.frequency &gt;= node2.frequency:</span><br><span class="line">            father_node.left_child = node1</span><br><span class="line">            father_node.right_child = node2</span><br><span class="line">        <span class="keyword">else</span>:</span><br><span class="line">            father_node.left_child = node2</span><br><span class="line">            father_node.right_child = node1</span><br><span class="line">        self.huffman.append(father_node)</span><br><span class="line">        <span class="keyword">return</span> father_node</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">build_tree</span>(<span class="params">self, node_list</span>):</span></span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">len</span>(node_list) &gt; <span class="number">1</span>:</span><br><span class="line">            i1 = <span class="number">0</span> </span><br><span class="line">            i2 = <span class="number">1</span> </span><br><span class="line">            <span class="keyword">if</span> node_list[i2].frequency &lt; node_list[i1].frequency:</span><br><span class="line">                [i1, i2] = [i2, i1]</span><br><span class="line">            <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">2</span>, <span class="built_in">len</span>(node_list)):</span><br><span class="line">                <span class="keyword">if</span> node_list[i].frequency &lt; node_list[i2].frequency:</span><br><span class="line">                    i2 = i</span><br><span class="line">                    <span class="keyword">if</span> node_list[i2].frequency &lt; node_list[i1].frequency:</span><br><span class="line">                        [i1, i2] = [i2, i1]</span><br><span class="line">                <span class="comment"># print(&#x27;i1,i2&#x27;,[i1,i2])</span></span><br><span class="line">            father_node = self.merge_node(node_list[i1], node_list[i2]) </span><br><span class="line">            <span class="keyword">if</span> i1 &lt; i2:</span><br><span class="line">                node_list.pop(i2)</span><br><span class="line">                node_list.pop(i1)</span><br><span class="line">            <span class="keyword">elif</span> i1 &gt; i2:</span><br><span class="line">                node_list.pop(i1)</span><br><span class="line">                node_list.pop(i2)</span><br><span class="line">            <span class="keyword">else</span>:</span><br><span class="line">                <span class="keyword">raise</span> RuntimeError(<span class="string">&#x27;i1 should not be equal to i2&#x27;</span>)</span><br><span class="line">            node_list.insert(<span class="number">0</span>, father_node) </span><br><span class="line">        self.root = node_list[<span class="number">0</span>]</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">generate_huffman_code_and_path</span>(<span class="params">self</span>):</span></span><br><span class="line">        stack = [self.root]</span><br><span class="line">        <span class="keyword">while</span> <span class="built_in">len</span>(stack) &gt; <span class="number">0</span>:</span><br><span class="line">            node = stack.pop()</span><br><span class="line">            <span class="keyword">while</span> node.left_child <span class="keyword">or</span> node.right_child:</span><br><span class="line">                code = node.Huffman_code</span><br><span class="line">                path = node.path</span><br><span class="line">                node.left_child.Huffman_code = code + [<span class="number">1</span>]</span><br><span class="line">                node.right_child.Huffman_code = code + [<span class="number">0</span>]</span><br><span class="line">                node.left_child.path = path + [node.word_id]</span><br><span class="line">                node.right_child.path = path + [node.word_id]</span><br><span class="line">                stack.append(node.right_child)</span><br><span class="line">                node = node.left_child</span><br><span class="line">            word_id = node.word_id</span><br><span class="line">            word_code = node.Huffman_code</span><br><span class="line">            word_path = node.path</span><br><span class="line">            self.huffman[word_id].Huffman_code = word_code</span><br><span class="line">            self.huffman[word_id].path = word_path</span><br><span class="line">            self.wordid_code[word_id] = word_code</span><br><span class="line">            self.wordid_path[word_id] = word_path</span><br><span class="line"></span><br><span class="line">    </span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">get_all_pos_and_neg_path</span>(<span class="params">self</span>):</span></span><br><span class="line">        positive = []  </span><br><span class="line">        negative = []  </span><br><span class="line">        <span class="keyword">for</span> word_id <span class="keyword">in</span> <span class="built_in">range</span>(self.word_count):</span><br><span class="line">            pos_id = []  </span><br><span class="line">            neg_id = []  </span><br><span class="line">            <span class="keyword">for</span> i, code <span class="keyword">in</span> <span class="built_in">enumerate</span>(self.huffman[word_id].Huffman_code):</span><br><span class="line">                <span class="keyword">if</span> code == <span class="number">1</span>:</span><br><span class="line">                    pos_id.append(self.huffman[word_id].path[i])</span><br><span class="line">                <span class="keyword">else</span>:</span><br><span class="line">                    neg_id.append(self.huffman[word_id].path[i])</span><br><span class="line">            positive.append(pos_id)</span><br><span class="line">            negative.append(neg_id)</span><br><span class="line">        <span class="keyword">return</span> positive, negative</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">test</span>():</span></span><br><span class="line">    word_frequency = &#123;<span class="number">0</span>: <span class="number">4</span>, <span class="number">1</span>: <span class="number">6</span>, <span class="number">2</span>: <span class="number">3</span>, <span class="number">3</span>: <span class="number">2</span>, <span class="number">4</span>: <span class="number">2</span>&#125;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">&#x27;word_frequency&#x27;</span>,word_frequency)</span><br><span class="line">    tree = HuffmanTree(word_frequency)</span><br><span class="line">    <span class="built_in">print</span>(tree.wordid_code)</span><br><span class="line">    <span class="built_in">print</span>(tree.wordid_path)</span><br><span class="line">    <span class="keyword">for</span> i <span class="keyword">in</span> <span class="built_in">range</span>(<span class="built_in">len</span>(word_frequency)):</span><br><span class="line">        <span class="built_in">print</span>(tree.huffman[i].path)</span><br><span class="line">    <span class="built_in">print</span>(tree.get_all_pos_and_neg_path())</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">&#x27;__main__&#x27;</span>:</span><br><span class="line">    test()</span><br></pre></td></tr></table></figure>
+<p>撒花<em>★,°</em>:.☆(￣▽￣)/$:<em>.°★</em> 。</p>
+ 
+      <!-- reward -->
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+          
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://example.com/2021/11/30/Huffman-tree%E7%9A%84python%E5%AE%9E%E7%8E%B0/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/Code/" rel="tag">Code</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2021/11/29/CBOW%E8%AE%BA%E6%96%87%E9%98%85%E8%AF%BB/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Hierarchical Probabilistic论文阅读</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "EzVMmC0IPDcSjP8s13StseE6-gzGzoHsz",
+    app_key: "Hzit4QKLWWayui9Bw7TSy0a8",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+   
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2015-2021
+        <i class="ri-heart-fill heart_icon"></i> Evitcet
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+      </li>
+    </ul>
+  </div>
+</footer>    
+    </main>
+    <div class="float_btns">
+      <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+    </div>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/Camus.jpg" alt="evitcet&#39;s blog"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags/travel">旅行</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/friends">友链</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+      <a class="nav-item-link" target="_blank" href="/atom.xml" title="RSS Feed">
+        <i class="ri-rss-line"></i>
+      </a>
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i></p>
+  <div class="reward-box">
+    
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-3.6.0.min.js"></script>
+ 
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+ 
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: ".tocbot",
+    contentSelector: ".article-entry",
+    headingSelector: "h1, h2, h3, h4, h5, h6",
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: "main",
+    positionFixedSelector: ".tocbot",
+    positionFixedClass: "is-position-fixed",
+    fixedSidebarOffset: "auto",
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css"
+/>
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+ <!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script> 
+<!-- MathJax -->
+ <script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+      tex2jax: {
+          inlineMath: [ ['$','$'], ["\\(","\\)"]  ],
+          processEscapes: true,
+          skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+      }
+  });
+
+  MathJax.Hub.Queue(function() {
+      var all = MathJax.Hub.getAllJax(), i;
+      for(i=0; i < all.length; i += 1) {
+          all[i].SourceElement().parentNode.className += ' has-jax';
+      }
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/mathjax@2.7.6/unpacked/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script>
+  var ayerConfig = {
+    mathjax: true,
+  };
+</script>
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+<!-- CodeCopy -->
+ 
+<link rel="stylesheet" href="/css/clipboard.css">
+ <script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+ 
+<!-- CanvasBackground -->
+
+<script>
+  if (window.mermaid) {
+    mermaid.initialize({ theme: "forest" });
+  }
+</script>
+
+
+    
+    
+
+  </div>
+</body>
+
+</html>
